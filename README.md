@@ -233,29 +233,53 @@ graph TD
 
 ```mermaid
 graph TD
-    A["HashSet&lt;E&gt;"] --> B["Backed by HashMap"]
-    A --> C["Values stored as keys"]
-    A --> D["Dummy value for all entries"]
-    
-    E["Hash Function"] --> E1["hashCode() on object"]
-    E --> E2["Hash modulo table size"]
-    E --> E3["Maps to bucket index"]
-    
-    F["Collision Resolution"] --> F1["Chaining (JDK 8+)"]
-    F1 --> F1a["Linked list of entries"]
-    F1 --> F1b["Converts to Red-Black Tree"]
-    F1 --> F1c["When chain length > 8"]
-    
-    G["Load Factor"] --> G1["Default: 0.75"]
-    G --> G2["Resize when entries > capacity × 0.75"]
-    G --> G3["New capacity: 2x"]
-    
-    H["Performance"] --> H1["add/remove/contains: O(1) avg"]
-    H --> H2["O(n) worst case (poor hash)"]
-    H --> H3["Iteration: O(n + capacity)"]
-    
-    style H1 fill:#c8e6c9
-    style H2 fill:#ffcccc
+    %% Entry Point
+    A["HashSet&lt;E&gt;<br/>The Wrapper"] --> B["Backed by HashMap&lt;E, Object&gt;"]
+    B --> B1["Value = Your Element (Key)"]
+    B --> B2["Value = PRESENT (Constant Dummy Object)"]
+
+    %% The Hashing Process
+    subgraph Hashing ["Phase 1: The Hash Function"]
+        E["Object.hashCode()"] --> E1["Spread Function<br/>(High-bit XOR)"]
+        E1 --> E2["Index = (n-1) & hash"]
+        E2 --> E3["Target Bucket Index"]
+    end
+
+    B --> Hashing
+
+    %% Collision Logic
+    subgraph Collision ["Phase 2: Collision Resolution"]
+        F["Bucket Occupied?"] --> F1["Chaining<br/>(Singly Linked List)"]
+        F1 --> F2{Chain Length > 8?}
+        F2 -->|Yes| F3["Treeification<br/>(Convert to Red-Black Tree)"]
+        F2 -->|No| F4["Stay as List"]
+    end
+
+    Hashing --> Collision
+
+    %% Maintenance Logic
+    subgraph Growth ["Phase 3: Resizing & Load Factor"]
+        G["Threshold Exceeded?<br/>(Size > Capacity × 0.75)"] --> G1["Resize (2x Capacity)"]
+        G1 --> G2["Rehash all elements"]
+    end
+
+    Collision --> Growth
+
+    %% Performance Summary
+    subgraph Metrics ["Phase 4: Performance Complexity"]
+        H1["Average: O(1)"]
+        H2["Worst Case: O(log n)<br/>(Due to Treeification)"]
+        H3["Iteration: O(Capacity + Size)"]
+    end
+
+    Growth --> Metrics
+
+    %% Styling
+    style A fill:#e1f5ff,stroke:#01579b
+    style H1 fill:#c8e6c9,stroke:#2e7d32
+    style H2 fill:#ffcccc,stroke:#c62828
+    style Hashing fill:#f9f9f9,stroke-dasharray: 5 5
+    style Collision fill:#f9f9f9,stroke-dasharray: 5 5
 ```
 
 ### TreeSet: Red-Black Tree Implementation
