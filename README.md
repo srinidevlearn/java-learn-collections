@@ -190,25 +190,44 @@ graph LR
 ### LinkedList Internal Structure
 
 ```mermaid
-graph LR
-    A["LinkedList"] --> B["Node&lt;E&gt;"]
-    B --> B1["item: E"]
-    B --> B2["next: Node"]
-    B --> B3["prev: Node"]
-    
-    C["Characteristics"] --> C1["Doubly-linked"]
-    C --> C2["Bidirectional traversal"]
-    C --> C3["No random access"]
-    C --> C4["Memory overhead: 2 pointers/node"]
-    
-    D["Operations"] --> D1["add(E): O(1)"]
-    D --> D2["remove(int): O(n)"]
-    D --> D3["removeFirst/Last: O(1)"]
-    D --> D4["get(int): O(n)"]
-    
-    style B fill:#ffccbc
-    style C1 fill:#ffccbc
-    style D1 fill:#c8e6c9
+graph TD
+    %% Physical Structure
+    subgraph Structure [Memory Layout: Doubly Linked]
+        Header["LinkedList Object<br/>(size, first, last)"]
+        
+        Node["Node&lt;E&gt;<br/>(The Container)"]
+        
+        Header --> Node
+        
+        Node --- P["prev: Pointer to previous"]
+        Node --- I["item: Data Element (E)"]
+        Node --- N["next: Pointer to next"]
+    end
+
+    %% Capabilities
+    subgraph Capabilities [Logic & Traversal]
+        C1["Bidirectional Traversal"]
+        C2["No Random Access<br/>(Must follow pointers)"]
+        C3["Implements List & Deque"]
+    end
+
+    Structure --> Capabilities
+
+    %% Big-O Performance
+    subgraph Performance [Time Complexity]
+        D1["addFirst / addLast: O(1)"]
+        D2["removeFirst / removeLast: O(1)"]
+        D3["get(index): O(n)<br/>(Starts from closest end)"]
+        D4["remove(Object): O(n)"]
+    end
+
+    Capabilities --> Performance
+
+    %% Styling
+    style Node fill:#ffccbc,stroke:#e64a19
+    style D1 fill:#c8e6c9,stroke:#2e7d32
+    style D2 fill:#c8e6c9,stroke:#2e7d32
+    style D3 fill:#fff9c4,stroke:#fbc02d
 ```
 
 ### Choosing Between ArrayList and LinkedList
