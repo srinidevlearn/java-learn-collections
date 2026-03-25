@@ -25,42 +25,42 @@
 
 ```mermaid
 graph TD
-    A["Iterable&lt;E&gt;"] --> B["Collection&lt;E&gt;"]
-    B --> C["List&lt;E&gt;"]
-    B --> D["Set&lt;E&gt;"]
-    B --> E["Queue&lt;E&gt;"]
+    %% Interfaces
+    subgraph Interfaces
+        A["Iterable&lt;E&gt;"] --> B["Collection&lt;E&gt;"]
+        B --> C["List&lt;E&gt;"]
+        B --> D["Set&lt;E&gt;"]
+        B --> E["Queue&lt;E&gt;"]
+        E --> E_Deq["Deque&lt;E&gt;"]
+        D --> D_Sorted["SortedSet&lt;E&gt;"]
+        D_Sorted --> D_Nav["NavigableSet&lt;E&gt;"]
+    end
+
+    %% Implementations
+    C -.-> C1["ArrayList"]
+    C -.-> C2["LinkedList"]
+    C -.-> C3["Vector"]
+    C3 --> C4["Stack"]
     
-    C --> C1["ArrayList"]
-    C --> C2["LinkedList"]
-    C --> C3["Vector<br/>CopyOnWriteArrayList"]
-    C --> C4["Stack"]
+    D_Nav -.-> D2["TreeSet"]
+    D -.-> D1["HashSet"]
+    D1 --> D3["LinkedHashSet"]
     
-    D --> D1["HashSet"]
-    D --> D2["TreeSet"]
-    D --> D3["LinkedHashSet"]
-    D --> D4["EnumSet"]
-    D --> D5["ConcurrentSkipListSet"]
-    
-    E --> E1["PriorityQueue"]
-    E --> E2["LinkedList"]
-    E --> E3["ArrayDeque"]
-    E --> E4["ConcurrentLinkedQueue"]
-    
-    F["Map&lt;K,V&gt;"] --> F1["HashMap"]
-    F --> F2["TreeMap"]
-    F --> F3["LinkedHashMap"]
-    F --> F4["WeakHashMap"]
-    F --> F5["IdentityHashMap"]
-    F --> F6["EnumMap"]
-    F --> F7["ConcurrentHashMap"]
-    F --> F8["ConcurrentSkipListMap"]
-    
+    E -.-> E1["PriorityQueue"]
+    E_Deq -.-> E2["ArrayDeque"]
+    E_Deq -.-> C2 %% LinkedList implements Deque too
+
+    %% Maps (Separate Hierarchy)
+    F["Map&lt;K,V&gt;"] -.-> F1["HashMap"]
+    F1 --> F3["LinkedHashMap"]
+    F -.-> F_Sorted["SortedMap"]
+    F_Sorted --> F_Nav["NavigableMap"]
+    F_Nav -.-> F2["TreeMap"]
+
     style A fill:#e1f5ff
     style B fill:#e1f5ff
-    style C fill:#fff3e0
-    style D fill:#f3e5f5
-    style E fill:#e8f5e9
-    style F fill:#fce4ec
+    style Interfaces fill:#f9f9f9,stroke-dasharray: 5 5
+
 ```
 
 ### Conceptual Relationships
