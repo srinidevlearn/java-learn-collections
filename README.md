@@ -737,28 +737,87 @@ graph LR
 ```mermaid
 graph TD
     A["Iteration Strategy"] --> B["ArrayList"]
-    B --> B1["for(int i=0; i<list.size(); i++)"]
-    B --> B1a["Fastest: direct index access"]
+    B --> B1["for(int i=0; i < list.size(); i++)"]
+    B1 --> B1a["Fastest: Direct index access"]
     
-    B --> B2["Enhanced for or iterator"]
-    B --> B2a["Still O(n) but with overhead"]
+    B --> B2["Enhanced for or Iterator"]
+    B --> B2a["Still O(n) but with object overhead"]
     
-    C["LinkedList"] --> C1["Enhanced for or iterator"]
-    C --> C1a["Fastest: use iterator internally"]
+    C["LinkedList"] --> C1["Enhanced for or Iterator"]
+    C --> C1a["Fastest: Uses internal pointers"]
     
-    C --> C2["for(int i=0; i<list.size(); i++)"]
-    C --> C2a["AVOID: O(n²) - traversing each time!"]
+    C --> C2["for(int i=0; i < list.size(); i++)"]
+    C2 --> C2a["AVOID: O(n²) - traverses from start every time!"]
     
-    D["HashMap/HashSet"] --> D1["Iterator or enhanced for"]
+    D["HashMap / HashSet"] --> D1["Iterator or Enhanced for"]
     D --> D1a["Only way: O(n + capacity)"]
     
-    E["TreeSet/TreeMap"] --> E1["Iterator: O(n) in sorted order"]
+    E["TreeSet / TreeMap"] --> E1["Iterator: O(n) in sorted order"]
     E --> E1a["In-order traversal"]
     
-    style B1 fill:#c8e6c9
-    style C2a fill:#ff9999
-    style D1a fill:#c8e6c9
+    style B1 fill:#c8e6c9,stroke:#2e7d32
+    style C2a fill:#ff9999,stroke:#c62828
+    style D1a fill:#c8e6c9,stroke:#2e7d32
 ```
+Note:
+### ⚠️ Performance Warning: The $O(n^2)$ Trap
+
+When iterating over a `LinkedList`, the **choice of loop** drastically impacts performance. Using a standard `for` loop with `list.get(i)` is a common anti-pattern that leads to quadratic time complexity.
+
+
+
+#### ❌ The Anti-Pattern ($O(n^2)$)
+```java
+// Total Complexity: O(n^2)
+for (int i = 0; i < list.size(); i++) {
+    System.out.println(list.get(i)); 
+}
+```
+**Why it's slow:** `LinkedList` does not support random access. Every time `list.get(i)` is called, the JVM must start from the `head` (or `tail`) and step through $i$ nodes. For a list of size $n$, the total operations are $1 + 2 + 3 + ... + n$, resulting in **$O(n^2)$**.
+
+#### ✅ The Best Practice ($O(n)$)
+```java
+// Total Complexity: O(n)
+for (String item : list) {
+    System.out.println(item);
+}
+// OR
+list.forEach(System.out::println);
+```
+**Why it's fast:** The enhanced `for-each` loop (and `Iterator`) keeps a pointer to the **current node**. Moving to the next element is a simple $O(1)$ operation (following the `next` pointer), resulting in a linear **$O(n)$** total traversal.
+
+---
+
+### Iteration Strategy Comparison
+
+
+
+```mermaid
+graph TD
+    A["Iteration Strategy"] --> B["ArrayList"]
+    B --> B1["for(int i=0; i < list.size(); i++)"]
+    B --> B1a["Fastest: Direct index access"]
+    
+    B --> B2["Enhanced for or Iterator"]
+    B --> B2a["Still O(n) but with object overhead"]
+    
+    C["LinkedList"] --> C1["Enhanced for or Iterator"]
+    C --> C1a["Fastest: Uses internal pointers"]
+    
+    C --> C2["for(int i=0; i < list.size(); i++)"]
+    C2 --> C2a["AVOID: O(n²) - traverses from start every time!"]
+    
+    D["HashMap / HashSet"] --> D1["Iterator or Enhanced for"]
+    D --> D1a["Only way: O(n + capacity)"]
+    
+    E["TreeSet / TreeMap"] --> E1["Iterator: O(n) in sorted order"]
+    E --> E1a["In-order traversal"]
+    
+    style B1 fill:#c8e6c9,stroke:#2e7d32
+    style C2a fill:#ff9999,stroke:#c62828
+    style D1a fill:#c8e6c9,stroke:#2e7d32
+```
+
 
 ---
 
