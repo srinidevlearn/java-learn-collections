@@ -305,28 +305,50 @@ graph TD
 
 ```mermaid
 graph TD
-    A["TreeSet&lt;E&gt;"] --> B["Backed by TreeMap"]
-    A --> C["Elements stored as keys"]
-    
-    D["Red-Black Tree"] --> D1["Binary Search Tree"]
-    D --> D2["Color property: Red or Black"]
-    D --> D3["Self-balancing"]
-    D --> D4["Height: O(log n)"]
-    
-    E["Performance"] --> E1["add/remove/contains: O(log n)"]
-    E --> E2["Iteration: O(n) in sorted order"]
-    E --> E3["Range operations: O(log n)"]
-    
-    F["Range Views"] --> F1["subSet(from, to)"]
-    F --> F2["headSet(to)"]
-    F --> F3["tailSet(from)"]
-    
-    G["Comparator"] --> G1["Natural ordering: Comparable"]
-    G --> G2["Custom: Comparator argument"]
-    G --> G3["Must be consistent with equals"]
-    
-    style E1 fill:#bbdefb
-    style E3 fill:#bbdefb
+    %% Base Structure
+    subgraph Structure [Underlying Engine]
+        A["TreeSet&lt;E&gt;"] --> B["TreeMap&lt;E, Object&gt;"]
+        B --> B1["Elements = Keys"]
+        B --> B2["Value = PRESENT (Dummy)"]
+    end
+
+    %% The Balancing Act
+    subgraph Balancing [Self-Balancing: Red-Black Tree]
+        D["Binary Search Tree Logic"]
+        D --> D1["Left &lt; Parent &lt; Right"]
+        D --> D2["Color Property (Red/Black)<br/>prevents skewing"]
+        D --> D3["Guaranteed Height: O(log n)"]
+    end
+
+    Structure --> Balancing
+
+    %% Sorting Requirements
+    subgraph Ordering [Ordering Contract]
+        G["How to Sort?"] --> G1["Natural: Comparable&lt;T&gt;<br/>(Uses compareTo)"]
+        G --> G2["Custom: Comparator&lt;T&gt;<br/>(Passed to Constructor)"]
+        G3["Crucial: compare == 0 means 'Same'"]
+        G --> G3
+    end
+
+    Balancing --> Ordering
+
+    %% Functional Power
+    subgraph Features [Navigation & Complexity]
+        F["Range Views (O(log n))"]
+        F --> F1["subSet / headSet / tailSet"]
+        
+        P["Complexity"]
+        P --> P1["Add/Remove/Get: O(log n)"]
+        P --> P2["Iteration: O(n)<br/>(In-order Traversal)"]
+    end
+
+    Ordering --> Features
+
+    %% Styling
+    style A fill:#f3e5f5,stroke:#4a148c
+    style P1 fill:#bbdefb,stroke:#1976d2
+    style P2 fill:#fff9c4,stroke:#fbc02d
+    style G3 fill:#ffcdd2,stroke:#c62828
 ```
 
 ### LinkedHashSet: Insertion Order Preservation
