@@ -918,7 +918,66 @@ graph TD
     style F3 fill:#c8e6c9
 ```
 
-### Comparator vs Comparable
+### Ordering Strategies: Comparable vs. Comparator
+
+In Java, sorting and ordering are governed by two distinct interfaces. Choosing the right one depends on whether you want a **default** behavior or **flexible, multiple** behaviors.
+
+---
+
+#### 1. Comparable: Natural Ordering
+* **Definition:** The class itself defines its own default sorting logic by implementing the interface.
+* **Method:** `public int compareTo(T other)`
+* **Usage:** Best for "Natural" order (e.g., Dates by time, Strings alphabetically).
+* **Constraint:** You can only have **one** implementation per class.
+
+**Sample Logic:**
+```java
+public class Student implements Comparable<Student> {
+    private int id;
+    private String name;
+
+    // Natural order: sort by ID ascending
+    @Override
+    public int compareTo(Student other) {
+        // Returns negative if this < other, 0 if equal, positive if this > other
+        return this.id - other.id; 
+    }
+}
+```
+
+#### 2. Comparator: Custom Ordering
+* **Definition:** An external "judge" that compares two objects.
+* **Method:** `public int compare(T o1, T o2)`
+* **Usage:** Used for **multiple** sorting strategies or when you cannot modify the target class.
+
+**Sample Logic (Modern Java 8+ Lambda):**
+```java
+// Concise lambda expression
+Comparator<Student> nameComparator = (s1, s2) -> s1.getName().compareTo(s2.getName());
+
+// Usage
+Collections.sort(studentList, nameComparator);
+```
+
+**Sample Logic (Old Java 7/8 Anonymous Class):**
+```java
+// The "Old Way" before Lambdas were common
+Comparator<Student> ageComparator = new Comparator<Student>() {
+    @Override
+    public int compare(Student s1, Student s2) {
+        return s1.getAge() - s2.getAge();
+    }
+};
+
+// Usage
+Collections.sort(studentList, ageComparator);
+```
+
+---
+
+#### Architecture Overview
+
+
 
 ```mermaid
 graph TD
@@ -945,9 +1004,18 @@ graph TD
     F --> F2["Collections.sort() accepts Comparator"]
     F --> F3["Lambdas: Collections.sort(list, (a,b) -> a-b)"]
     
-    style B3 fill:#bbdefb
-    style C3 fill:#bbdefb
+    style B3 fill:#bbdefb,stroke:#1976d2
+    style C3 fill:#bbdefb,stroke:#1976d2
 ```
+
+---
+
+#### ⚠️ Critical Note: Consistency with `equals()`
+For sorted collections like `TreeSet` or `TreeMap`, it is vital that your sorting logic is **consistent with equals**. 
+* **The Rule:** If `a.equals(b)` is `true`, then `compare(a, b)` **must** return `0`.
+* **The Risk:** If the comparator returns `0` for two objects that are not actually "equal" via `.equals()`, `TreeSet` will treat them as duplicates and refuse to add the second one.
+
+
 
 ### Capacity vs Size
 
