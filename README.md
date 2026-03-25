@@ -25,8 +25,8 @@
 
 ```mermaid
 graph TD
-    %% Interfaces
-    subgraph Interfaces
+    %% Interfaces (The Blueprints)
+    subgraph Interfaces ["Interfaces (Extend each other)"]
         A["Iterable&lt;E&gt;"] --> B["Collection&lt;E&gt;"]
         B --> C["List&lt;E&gt;"]
         B --> D["Set&lt;E&gt;"]
@@ -36,31 +36,37 @@ graph TD
         D_Sorted --> D_Nav["NavigableSet&lt;E&gt;"]
     end
 
-    %% Implementations
-    C -.-> C1["ArrayList"]
-    C -.-> C2["LinkedList"]
-    C -.-> C3["Vector"]
-    C3 --> C4["Stack"]
+    %% Implementations (The Concrete Classes)
+    subgraph Classes ["Classes (Implement Interfaces)"]
+        C1["ArrayList"]
+        C2["LinkedList"]
+        C3["Vector"]
+        C4["Stack"]
+        D1["HashSet"]
+        D2["TreeSet"]
+        D3["LinkedHashSet"]
+        E1["PriorityQueue"]
+        E2["ArrayDeque"]
+    end
+
+    %% Relationships
+    C -.-> C1
+    C -.-> C2
+    C -.-> C3
+    C3 --> C4
     
-    D_Nav -.-> D2["TreeSet"]
-    D -.-> D1["HashSet"]
-    D1 --> D3["LinkedHashSet"]
+    D -.-> D1
+    D_Nav -.-> D2
+    D1 --> D3
     
-    E -.-> E1["PriorityQueue"]
-    E_Deq -.-> E2["ArrayDeque"]
-    E_Deq -.-> C2 %% LinkedList implements Deque too
+    E -.-> E1
+    E_Deq -.-> E2
+    %% LinkedList implements both List and Deque
+    E_Deq -.-> C2
 
-    %% Maps (Separate Hierarchy)
-    F["Map&lt;K,V&gt;"] -.-> F1["HashMap"]
-    F1 --> F3["LinkedHashMap"]
-    F -.-> F_Sorted["SortedMap"]
-    F_Sorted --> F_Nav["NavigableMap"]
-    F_Nav -.-> F2["TreeMap"]
-
-    style A fill:#e1f5ff
-    style B fill:#e1f5ff
-    style Interfaces fill:#f9f9f9,stroke-dasharray: 5 5
-
+    %% Styling
+    style Interfaces fill:#e1f5ff,stroke:#01579b
+    style Classes fill:#fff3e0,stroke:#e65100
 ```
 
 ### Conceptual Relationships
