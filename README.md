@@ -981,31 +981,44 @@ Collections.sort(studentList, ageComparator);
 
 ```mermaid
 graph TD
-    A["Ordering Strategies"] --> B["Comparable"]
-    B --> B1["Interface in object's class"]
-    B --> B2["compareTo(T other)"]
-    B --> B3["Natural ordering"]
-    B --> B4["One implementation per class"]
+    A["Ordering Strategies"]
+    A --> B["Comparable"]
+    A --> C["Comparator"]
     
-    C["Comparator"] --> C1["Separate class or lambda"]
-    C --> C2["compare(T o1, T o2)"]
-    C --> C3["Custom ordering"]
-    C --> C4["Multiple implementations per class"]
+    subgraph Comparable_Details [Comparable: Internal]
+        B --> B1["Implemented by the class itself"]
+        B1 --> B2["Method: compareTo(T other)"]
+        B2 --> B3["Defines 'Natural' ordering"]
+        B3 --> B4["Only ONE implementation possible"]
+    end
     
-    D["Examples"] --> D1["Integer implements Comparable"]
-    D --> D2["Ascending by default"]
-    D --> D3["TreeSet uses Comparable or Comparator arg"]
+    subgraph Comparator_Details [Comparator: External]
+        C --> C1["Separate class or Lambda"]
+        C1 --> C2["Method: compare(T o1, T o2)"]
+        C2 --> C3["Defines 'Custom' ordering"]
+        C3 --> C4["MULTIPLE implementations possible"]
+    end
     
-    E["Consistency"] --> E1["compareTo must be consistent with equals"]
-    E --> E2["compare should also be consistent"]
-    E --> E3["Violating can cause issues in TreeSet"]
+    Comparable_Details --> D["Examples"]
+    Comparator_Details --> D
     
-    F["Practical"] --> F1["TreeMap/TreeSet require one"]
-    F --> F2["Collections.sort() accepts Comparator"]
-    F --> F3["Lambdas: Collections.sort(list, (a,b) -> a-b)"]
+    subgraph Practical_Use [Practical Application]
+        D --> D1["Integer/String implement Comparable"]
+        D1 --> D2["TreeSet/TreeMap use these for sorting"]
+        D2 --> D3["Collections.sort() accepts Comparator"]
+    end
     
+    Practical_Use --> E["Critical: Consistency"]
+    
+    subgraph Consistency_Rule [The Equality Contract]
+        E --> E1["compare/compareTo should be consistent with equals()"]
+        E1 --> E2["If compare == 0, then equals should be true"]
+        E2 --> E3["Inconsistency breaks TreeSet/TreeMap logic"]
+    end
+
     style B3 fill:#bbdefb,stroke:#1976d2
     style C3 fill:#bbdefb,stroke:#1976d2
+    style E3 fill:#ffcdd2,stroke:#c62828
 ```
 
 ---
