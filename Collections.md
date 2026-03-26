@@ -569,84 +569,218 @@ graph LR
 
 ```mermaid
 graph TD
-    A["Queue&lt;E&gt;"] --> B["FIFO: First-in, First-out"]
-    A --> C["Operations"]
+    %% Main Interface
+    Queue["Queue&lt;E&gt; Interface"]
     
-    C --> C1["add(E)/offer(E): enqueue"]
-    C --> C2["remove()/poll(): dequeue"]
-    C --> C3["element()/peek(): examine"]
+    %% Core Principle
+    Queue --> FIFO["Principle: FIFO (First-In, First-Out)"]
     
-    D["Exception vs Null Return"] --> D1["add/remove/element: throw"]
-    D --> D2["offer/poll/peek: return null/false"]
+    %% Operation Categories
+    Queue --> Ops["Core Operations"]
     
-    E["Queue Types"] --> E1["FIFO Queue: PriorityQueue"]
-    E --> E2["Double-Ended: Deque"]
-    E --> E3["Bounded: BlockingQueue"]
-    E --> E4["Unbounded concurrent: ConcurrentLinkedQueue"]
+    subgraph Methods ["Method Behavior Pairs"]
+        direction TB
+        Ops --> Throw["Throws Exception"]
+        Ops --> Safe["Returns Null/False"]
+        
+        Throw --> T1["add(e)"]
+        Throw --> T2["remove()"]
+        Throw --> T3["element()"]
+        
+        Safe --> S1["offer(e)"]
+        Safe --> S2["poll()"]
+        Safe --> S3["peek()"]
+    end
+
+    %% Implementation Types
+    Queue --> Types["Common Implementations"]
     
-    style D1 fill:#ffccbc
-    style D2 fill:#bbdefb
+    Types --> P["PriorityQueue (Heaps)"]
+    Types --> D["Deque (ArrayDeque/LinkedList)"]
+    Types --> B["BlockingQueue (Thread-safe)"]
+    Types --> C["ConcurrentLinkedQueue (Lock-free)"]
+
+    %% Styling
+    style Throw fill:#ffccbc,stroke:#333
+    style Safe fill:#bbdefb,stroke:#333
+    style Queue fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 ### PriorityQueue: Min-Heap Implementation
 
 ```mermaid
 graph TD
-    A["PriorityQueue&lt;E&gt;"] --> B["Binary Min-Heap"]
-    B --> B1["Parent < Children"]
-    B --> B2["Root = minimum element"]
-    B --> B3["Stored in array"]
+graph TD
+    %% Main Header
+    PQ["PriorityQueue&lt;E&gt;"]
     
-    C["Parent/Child Index"] --> C1["Parent: (i-1)/2"]
-    C --> C2["Left child: 2i+1"]
-    C --> C3["Right child: 2i+2"]
-    
-    D["Operations"] --> D1["add: O(log n) - bubble up"]
-    D --> D2["remove/poll: O(log n) - bubble down"]
-    D --> D3["peek: O(1)"]
-    
-    E["Comparator"] --> E1["Natural order (Comparable)"]
-    E --> E2["Custom Comparator"]
-    E --> E3["Min-heap by default"]
-    E --> E4["Max-heap: Collections.reverseOrder()"]
-    
-    F["Not Thread-Safe"] --> F1["Use PriorityBlockingQueue for MT"]
-    F --> F2["Or synchronize externally"]
-    
-    style D1 fill:#bbdefb
-    style D2 fill:#bbdefb
+    %% Internal Logic
+    PQ --> Logic["Internal Logic: Binary Min-Heap"]
+    subgraph Properties ["Heap Properties"]
+        direction TB
+        Logic --> P1["Parent &lt; Children"]
+        Logic --> P2["Root = Minimum Element"]
+        Logic --> P3["Stored in Array"]
+    end
+
+    %% The Math
+    PQ --> Math["Array Indexing Math"]
+    subgraph Indexing ["Formulas (at index i)"]
+        direction TB
+        Math --> M1["Parent: (i-1) / 2"]
+        Math --> M2["Left Child: 2i + 1"]
+        Math --> M3["Right Child: 2i + 2"]
+    end
+
+    %% Complexity
+    PQ --> Comp["Performance & Ops"]
+    subgraph Efficiency ["Time Complexity"]
+        direction TB
+        Comp --> C1["peek(): O(1)"]
+        Comp --> C2["offer/poll(): O(log n)"]
+        Comp --> C3["remove(obj): O(n)"]
+    end
+
+    %% Ordering & Safety
+    PQ --> Settings["Configuration"]
+    subgraph Config ["Customization"]
+        direction TB
+        Settings --> S1["Natural Order (Comparable)"]
+        Settings --> S2["Custom Comparator (Max-Heap)"]
+        Settings --> S3["Thread-Safety: Use PriorityBlockingQueue"]
+    end
+
+    %% Styling
+    style PQ fill:#f9f,stroke:#333,stroke-width:2px
+    style C1 fill:#c8e6c9
+    style C2 fill:#bbdefb
 ```
+🧠 Deep Dive: The "Bubble" Mechanics
+Since you mentioned "Bubble Up" and "Bubble Down" (also known as Sift-Up and Sift-Down), here is why they happen:
+
+Bubble Up (Add): When you add an element, it goes to the very end of the array (the bottom-right of the tree). To maintain the heap property, it "swaps" with its parent until it finds its rightful place.
+
+Bubble Down (Poll): When you remove the root, the last element in the array is moved to the root position. It then "sinks" down by swapping with its smallest child until the tree is balanced again.
+
+⚠️ A Common Gotcha: Iteration Order
+One thing that trips people up: if you print a PriorityQueue directly or use an Iterator, it will not appear sorted. * The array structure only guarantees that the root is the minimum.
+
+To get elements in sorted order, you must use poll() until the queue is empty.
+
+Since `PriorityQueue` is a **Min-Heap** by default, reversing it into a **Max-Heap** is a common task in coding interviews (like the "Kth Largest Element" problem).
+
+Here is the breakdown of how to implement both, along with the logic shift that happens under the hood.
+
+---
+
+#### 📉 1. Min-Heap (Default)
+In a Min-Heap, the smallest element stays at the root. Java uses the **Natural Order** of the elements (e.g., $1 < 2 < 3$).
+
+```java
+// Default constructor creates a Min-Heap
+PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+minHeap.addAll(Arrays.asList(10, 5, 20));
+
+System.out.println(minHeap.poll()); // Outputs: 5
+System.out.println(minHeap.poll()); // Outputs: 10
+```
+
+
+
+---
+
+#### 📈 2. Max-Heap (Reversed)
+To flip the logic so the largest element stays at the root, you provide a custom `Comparator`. There are two clean ways to do this:
+
+**Option A: Using Collections Utility**
+```java
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+```
+
+**Option B: Using a Lambda (Manual Logic)**
+```java
+// (a, b) -> b - a  swaps the comparison logic
+PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b - a);
+
+maxHeap.addAll(Arrays.asList(10, 5, 20));
+
+System.out.println(maxHeap.poll()); // Outputs: 20
+System.out.println(maxHeap.poll()); // Outputs: 10
+```
+
+---
+
+#### ⚖️ Summary Comparison
+
+| Feature | Min-Heap (Default) | Max-Heap (Custom) |
+| :--- | :--- | :--- |
+| **Root Element** | Smallest | Largest |
+| **Logic** | $a < b$ | $a > b$ |
+| **Comparator** | `null` (Natural) | `Collections.reverseOrder()` |
+| **Common Use** | Finding the "Top K Smallest" | Finding the "Top K Largest" |
+
+
+
+#### 💡 Pro-Tip: The "Kth" Strategy
+* If you want the **Kth Largest** element, use a **Min-Heap** of size $K$. As you add elements, peek/poll the smallest ones out. What remains at the root is the $Kth$ largest.
+* If you want the **Kth Smallest**, use a **Max-Heap** of size $K$.
 
 ### Deque: Double-Ended Queue
 
 ```mermaid
 graph TD
-    A["Deque&lt;E&gt;<br/>Double-Ended Queue"] --> B["Add/Remove both ends"]
+    %% Main Interface
+    Deque["Deque&lt;E&gt; Interface"]
+
+    %% Core Concept
+    Deque --> Concept["Double-Ended Access"]
+    subgraph Behavior ["End-to-End Control"]
+        direction TB
+        Concept --> B1["Add/Remove at Head (First)"]
+        Concept --> B2["Add/Remove at Tail (Last)"]
+    end
+
+    %% Method Mappings
+    Deque --> Mappings["Functional Mappings"]
     
-    C["Operations"] --> C1["addFirst/addLast"]
-    C --> C2["removeFirst/removeLast"]
-    C --> C3["getFirst/getLast"]
-    C --> C4["pollFirst/pollLast"]
-    C --> C5["peekFirst/peekLast"]
+    subgraph StackFlow ["Stack Mode (LIFO)"]
+        direction TB
+        S1["push() → addFirst()"]
+        S2["pop() → removeFirst()"]
+        S3["peek() → peekFirst()"]
+    end
+
+    subgraph QueueFlow ["Queue Mode (FIFO)"]
+        direction TB
+        Q1["offer() → addLast()"]
+        Q2["poll() → removeFirst()"]
+        Q3["peek() → peekFirst()"]
+    end
+
+    Mappings --> StackFlow
+    Mappings --> QueueFlow
+
+    %% Implementations
+    Deque --> Impl["Common Implementations"]
     
-    D["Stack as Deque"] --> D1["push() = addFirst()"]
-    D --> D2["pop() = removeFirst()"]
-    D --> D3["peek() = peekFirst()"]
-    
-    E["Queue as Deque"] --> E1["offer() = addLast()"]
-    E --> E2["poll() = removeFirst()"]
-    E --> E3["peek() = peekFirst()"]
-    
-    F["Implementations"] --> F1["ArrayDeque<br/>Resizable array<br/>O(1) all ends"]
-    F --> F2["LinkedList<br/>Doubly-linked<br/>O(1) all ends"]
-    
-    G["ArrayDeque vs LinkedList"] --> G1["ArrayDeque: prefer for Deque"]
-    G --> G2["LinkedList: also a List"]
-    G --> G3["ArrayDeque: better cache locality"]
-    
-    style F1 fill:#fff9c4
-    style G1 fill:#c8e6c9
+    subgraph Performance ["ArrayDeque vs LinkedList"]
+        direction TB
+        Impl --> AD["ArrayDeque (Circular Array)"]
+        Impl --> LL["LinkedList (Doubly Linked)"]
+        
+        AD --- AD_Notes["- O(1) All Ends<br/>- Best Cache Locality<br/>- Prefer for Stacks/Queues"]
+        LL --- LL_Notes["- O(1) All Ends<br/>- Implements List interface<br/>- High memory overhead"]
+    end
+
+    %% Styling
+    style Deque fill:#f9f,stroke:#333,stroke-width:2px
+    style AD fill:#fff9c4
+    style AD_Notes fill:#fff9c4,stroke-dasharray: 5 5
+    style StackFlow fill:#ffccbc
+    style QueueFlow fill:#bbdefb
 ```
+
 
 ### ArrayDeque: Circular Array
 
