@@ -612,56 +612,39 @@ graph TD
     %% Main Identity
     PQ["PriorityQueue&lt;E&gt; Deep Dive"]
     
-    %% Internal Storage Mechanism
-    PQ --> Storage["Physical Storage: Dynamic Array"]
-    subgraph ArrayMapping ["Array-to-Tree Mapping"]
-        direction TB
-        A0["Index 0: The Root (Minimum)"]
-        A1["Index i's Left Child: 2i + 1"]
-        A2["Index i's Right Child: 2i + 2"]
-        A3["Index i's Parent: (i - 1) / 2"]
-    end
-    Storage --> ArrayMapping
+    %% Storage
+    PQ --> Storage["1. Physical Storage: Dynamic Array"]
+    Storage --> A0["Index 0: Root (Minimum)"]
+    A0 --> A1["Child Indices: 2i + 1 & 2i + 2"]
+    A1 --> A2["Parent Index: (i - 1) / 2"]
 
-    %% Behavioral Logic: Sift Up
-    PQ --> SiftUp["Operation: offer(E e)"]
-    subgraph SiftUpLogic ["Sift-Up (Heapify Up)"]
-        direction TB
-        U1["1. Add element to the end of array"]
-        U2["2. Compare with Parent"]
-        U3["3. If Child &lt; Parent: Swap"]
-        U4["4. Repeat until Root or Parent &lt; Child"]
-    end
-    SiftUp --> SiftUpLogic
+    %% Sift Up
+    A2 --> SiftUp["2. Operation: offer(E e)"]
+    SiftUp --> U1["Add to end of array"]
+    U1 --> U2["Compare with Parent"]
+    U2 --> U3["If Smaller: Swap Up (Sift-Up)"]
+    U3 --> U4["Repeat until Root or Balanced"]
 
-    %% Behavioral Logic: Sift Down
-    PQ --> SiftDown["Operation: poll()"]
-    subgraph SiftDownLogic ["Sift-Down (Heapify Down)"]
-        direction TB
-        D1["1. Remove Root (Index 0)"]
-        D2["2. Move last array element to Root"]
-        D3["3. Compare Root with Smallest Child"]
-        D4["4. If Root &gt; Child: Swap"]
-        D5["5. Repeat until Leaf or Root &lt; Children"]
-    end
-    SiftDown --> SiftDownLogic
+    %% Sift Down
+    U4 --> SiftDown["3. Operation: poll()"]
+    SiftDown --> D1["Remove Root (Index 0)"]
+    D1 --> D2["Move last element to Root"]
+    D2 --> D3["Compare with smallest Child"]
+    D3 --> D4["If Larger: Swap Down (Sift-Down)"]
 
-    %% Key Performance Trade-offs
-    PQ --> Specs["Technical Constraints"]
-    subgraph Constraints ["Critical Rules"]
-        direction TB
-        R1["No Null Elements (throws NPE)"]
-        R2["Not Thread-Safe (use PriorityBlockingQueue)"]
-        R3["Iterator: No guaranteed order"]
-        R4["Resize: Grow by 50% to 100%"]
-    end
-    Specs --> Constraints
+    %% Constraints
+    D4 --> Specs["4. Technical Constraints"]
+    Specs --> R1["No Null Elements"]
+    R1 --> R2["Not Thread-Safe"]
+    R2 --> R3["Iterator is Unordered"]
+    R3 --> R4["Resize: Dynamic Growth"]
 
     %% Styling
     style PQ fill:#f9f,stroke:#333,stroke-width:2px
-    style S1 fill:#fff9c4
     style SiftUp fill:#c8e6c9
     style SiftDown fill:#ffccbc
+    style Specs fill:#bbdefb
+
 ```
 
 🧠 Deep Dive: The "Bubble" Mechanics
