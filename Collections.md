@@ -609,41 +609,52 @@ graph TD
 ### PriorityQueue: Min-Heap Implementation
 ```mermaid
 graph TD
-    %% Main Identity
-    PQ["PriorityQueue&lt;E&gt; Deep Dive"]
-    
-    %% Storage
-    PQ --> Storage["1. Physical Storage: Dynamic Array"]
-    Storage --> A0["Index 0: Root (Minimum)"]
-    A0 --> A1["Child Indices: 2i + 1 & 2i + 2"]
-    A1 --> A2["Parent Index: (i - 1) / 2"]
+    %% Block 1: The Foundation
+    subgraph Foundation ["1. Internal Structure (Storage)"]
+        PQ["PriorityQueue&lt;E&gt;"]
+        PQ --> Array["Dynamic Array: Element[ ]"]
+        Array --> Math["Math Indexing: <br/> Parent = (i-1)/2 <br/> Left = 2i+1 <br/> Right = 2i+2"]
+    end
 
-    %% Sift Up
-    A2 --> SiftUp["2. Operation: offer(E e)"]
-    SiftUp --> U1["Add to end of array"]
-    U1 --> U2["Compare with Parent"]
-    U2 --> U3["If Smaller: Swap Up (Sift-Up)"]
-    U3 --> U4["Repeat until Root or Balanced"]
+    %% Block 2: The Addition Process
+    subgraph Addition ["2. Insertion: offer(E e)"]
+        StartAdd["New Element Added"]
+        StartAdd --> Tail["Placed at end of Array"]
+        Tail --> SiftUp["Sift-Up (Bubble Up)"]
+        SiftUp --> CompareU["Compare with Parent"]
+        CompareU --> SwapU["If Smaller: Swap with Parent"]
+        SwapU --> RepeatU["Repeat until Root or Parent &lt; Child"]
+    end
 
-    %% Sift Down
-    U4 --> SiftDown["3. Operation: poll()"]
-    SiftDown --> D1["Remove Root (Index 0)"]
-    D1 --> D2["Move last element to Root"]
-    D2 --> D3["Compare with smallest Child"]
-    D3 --> D4["If Larger: Swap Down (Sift-Down)"]
+    %% Block 3: The Removal Process
+    subgraph Removal ["3. Extraction: poll()"]
+        StartRem["Root (Min) Removed"]
+        StartRem --> Replace["Last Element moved to Root"]
+        Replace --> SiftDown["Sift-Down (Bubble Down)"]
+        SiftDown --> CompareD["Compare with Smallest Child"]
+        CompareD --> SwapD["If Larger: Swap with Child"]
+        SwapD --> RepeatD["Repeat until Leaf or Root &lt; Children"]
+    end
 
-    %% Constraints
-    D4 --> Specs["4. Technical Constraints"]
-    Specs --> R1["No Null Elements"]
-    R1 --> R2["Not Thread-Safe"]
-    R2 --> R3["Iterator is Unordered"]
-    R3 --> R4["Resize: Dynamic Growth"]
+    %% Block 4: Configuration & Limits
+    subgraph Rules ["4. Constraints & Configuration"]
+        C1["No Nulls Allowed"]
+        C1 --> C2["Not Thread-Safe"]
+        C2 --> C3["Min-Heap: (Default)"]
+        C3 --> C4["Max-Heap: (Collections.reverseOrder)"]
+    end
 
-    %% Styling
+    %% Connecting the Blocks vertically
+    Foundation --> Addition
+    Addition --> Removal
+    Removal --> Rules
+
+    %% Styling for visual separation
     style PQ fill:#f9f,stroke:#333,stroke-width:2px
-    style SiftUp fill:#c8e6c9
-    style SiftDown fill:#ffccbc
-    style Specs fill:#bbdefb
+    style Foundation fill:#eee,stroke:#999
+    style Addition fill:#e1f5fe,stroke:#01579b
+    style Removal fill:#fff3e0,stroke:#e65100
+    style Rules fill:#f1f8e9,stroke:#33691e
 
 ```
 
