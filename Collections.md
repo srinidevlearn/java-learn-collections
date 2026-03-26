@@ -607,7 +607,7 @@ graph TD
 ```
 
 ### PriorityQueue: Min-Heap Implementation
-
+```mermaid
 graph TD
     %% Main Identity
     PQ["PriorityQueue&lt;E&gt; Deep Dive"]
