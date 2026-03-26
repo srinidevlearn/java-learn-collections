@@ -608,53 +608,62 @@ graph TD
 
 ### PriorityQueue: Min-Heap Implementation
 
-```mermaid
 graph TD
-graph TD
-    %% Main Header
-    PQ["PriorityQueue&lt;E&gt;"]
+    %% Main Identity
+    PQ["PriorityQueue&lt;E&gt; Deep Dive"]
     
-    %% Internal Logic
-    PQ --> Logic["Internal Logic: Binary Min-Heap"]
-    subgraph Properties ["Heap Properties"]
+    %% Internal Storage Mechanism
+    PQ --> Storage["Physical Storage: Dynamic Array"]
+    subgraph ArrayMapping ["Array-to-Tree Mapping"]
         direction TB
-        Logic --> P1["Parent &lt; Children"]
-        Logic --> P2["Root = Minimum Element"]
-        Logic --> P3["Stored in Array"]
+        A0["Index 0: The Root (Minimum)"]
+        A1["Index i's Left Child: 2i + 1"]
+        A2["Index i's Right Child: 2i + 2"]
+        A3["Index i's Parent: (i - 1) / 2"]
     end
+    Storage --> ArrayMapping
 
-    %% The Math
-    PQ --> Math["Array Indexing Math"]
-    subgraph Indexing ["Formulas (at index i)"]
+    %% Behavioral Logic: Sift Up
+    PQ --> SiftUp["Operation: offer(E e)"]
+    subgraph SiftUpLogic ["Sift-Up (Heapify Up)"]
         direction TB
-        Math --> M1["Parent: (i-1) / 2"]
-        Math --> M2["Left Child: 2i + 1"]
-        Math --> M3["Right Child: 2i + 2"]
+        U1["1. Add element to the end of array"]
+        U2["2. Compare with Parent"]
+        U3["3. If Child &lt; Parent: Swap"]
+        U4["4. Repeat until Root or Parent &lt; Child"]
     end
+    SiftUp --> SiftUpLogic
 
-    %% Complexity
-    PQ --> Comp["Performance & Ops"]
-    subgraph Efficiency ["Time Complexity"]
+    %% Behavioral Logic: Sift Down
+    PQ --> SiftDown["Operation: poll()"]
+    subgraph SiftDownLogic ["Sift-Down (Heapify Down)"]
         direction TB
-        Comp --> C1["peek(): O(1)"]
-        Comp --> C2["offer/poll(): O(log n)"]
-        Comp --> C3["remove(obj): O(n)"]
+        D1["1. Remove Root (Index 0)"]
+        D2["2. Move last array element to Root"]
+        D3["3. Compare Root with Smallest Child"]
+        D4["4. If Root &gt; Child: Swap"]
+        D5["5. Repeat until Leaf or Root &lt; Children"]
     end
+    SiftDown --> SiftDownLogic
 
-    %% Ordering & Safety
-    PQ --> Settings["Configuration"]
-    subgraph Config ["Customization"]
+    %% Key Performance Trade-offs
+    PQ --> Specs["Technical Constraints"]
+    subgraph Constraints ["Critical Rules"]
         direction TB
-        Settings --> S1["Natural Order (Comparable)"]
-        Settings --> S2["Custom Comparator (Max-Heap)"]
-        Settings --> S3["Thread-Safety: Use PriorityBlockingQueue"]
+        R1["No Null Elements (throws NPE)"]
+        R2["Not Thread-Safe (use PriorityBlockingQueue)"]
+        R3["Iterator: No guaranteed order"]
+        R4["Resize: Grow by 50% to 100%"]
     end
+    Specs --> Constraints
 
     %% Styling
     style PQ fill:#f9f,stroke:#333,stroke-width:2px
-    style C1 fill:#c8e6c9
-    style C2 fill:#bbdefb
+    style S1 fill:#fff9c4
+    style SiftUp fill:#c8e6c9
+    style SiftDown fill:#ffccbc
 ```
+
 🧠 Deep Dive: The "Bubble" Mechanics
 Since you mentioned "Bubble Up" and "Bubble Down" (also known as Sift-Up and Sift-Down), here is why they happen:
 
