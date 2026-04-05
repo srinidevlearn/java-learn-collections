@@ -1,4 +1,4 @@
-# ☕ Java Collections: Enterprise Cheatsheet
+# ☕ Java Collections: Day to Day Cheatsheet
 
 Quick reference for choosing, using, and optimizing collections in production.
 
